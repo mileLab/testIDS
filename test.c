@@ -10,7 +10,7 @@
 
 #include "aes.h"
 
-
+static uint8_t inputBuffer[64];
 static void phex(uint8_t* str);
 static int test_encrypt_cbc(void);
 static int test_decrypt_cbc(void);
@@ -105,8 +105,13 @@ static int test_encrypt_ecb(void)
     AES_ECB_encrypt(&ctx, in);
 
     printf("ECB encrypt: ");
-
+    // routating IV missing 
+    // 
     if (0 == memcmp((char*) out, (char*) in, 16)) {
+        for (size_t i = 0; i < 127; i++)
+        {
+            inputBuffer[i]=in[i];
+        }       
         printf("SUCCESS!\n");
 	return(0);
     } else {
@@ -159,9 +164,9 @@ static int test_decrypt_cbc(void)
 	return(1);
     }
 }
-/*
+
 static int decrypt_input_cbc(uint8_t in[]){
-    uint8_t inputBuffer[64];
+    
     memcpy(inputBuffer, in, sizeof(inputBuffer));
     uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
     uint8_t iv[]  = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
@@ -181,7 +186,7 @@ static int decrypt_input_cbc(uint8_t in[]){
 
     }
     }
- */
+ 
 static int test_encrypt_cbc(void)
 {
 #if defined(AES256)
